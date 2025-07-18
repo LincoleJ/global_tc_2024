@@ -1,0 +1,29 @@
+{
+  "chart": {
+    "title": "World regions according to the World Health Organization",
+    "subtitle": "",
+    "citation": "World Health Organization",
+    "originalChartUrl": "https://ourworldindata.org/grapher/who-regions?v=1&csvType=full&useColumnShortNames=false",
+    "selection": [
+      "Mexico"
+    ]
+  },
+  "columns": {
+    "World regions according to WHO": {
+      "titleShort": "World regions according to WHO",
+      "titleLong": "World regions according to WHO",
+      "descriptionKey": [],
+      "unit": "",
+      "timespan": "2023-2023",
+      "type": "String",
+      "owidVariableId": 900802,
+      "shortName": "who_region",
+      "lastUpdated": "2023-01-01",
+      "citationShort": "Our World in Data – processed by Our World in Data",
+      "citationLong": "Our World in Data – processed by Our World in Data. “World regions according to WHO” [dataset]. Our World in Data, “Regions” [original data].",
+      "fullMetadata": "https://api.ourworldindata.org/v1/indicators/900802.metadata.json"
+    }
+  },
+  "dateDownloaded": "2025-03-11",
+  "activeFilters": {}
+}
