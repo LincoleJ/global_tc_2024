@@ -99,5 +99,5 @@ Supplementary sensitivity analysis
 ```
 
 ## Data Availability
-
+The data used in this study were created from the following datasets. Tropical cyclone best track data during 1980-2024 are freely available at [IBTrACS](https://www.ncei.noaa.gov/products/international-best-track-archive); global gridded population data at 1km resolution during 1980-2020 are available quinquennially at [GHSL](https://human-settlement.emergency.copernicus.eu/download.php?ds=pop); global gridded deprivation index data at 1km resolution in 2020 are available at [EarthData](https://www.earthdata.nasa.gov/data/catalog/sedac-ciesin-sedac-pmp-grdi-2010-2020-1.00). 
 
