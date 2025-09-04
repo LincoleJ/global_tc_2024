@@ -12,6 +12,7 @@ library(patchwork)
 library(lubridate)
 
 # 0b. Load data
+source("./02_code/20_setup/01_helper_functions.R")
 # storm track data
 all_storms = readr::read_csv("./01_data/1a_raw/IBTrACS_raw_data/ibtracs.last3years.list.v04r01.csv")
 hurr_tracks_2024 = data.frame(unique_identifier = all_storms$SID,
@@ -32,9 +33,8 @@ hurr_tracks_2024 = data.frame(unique_identifier = all_storms$SID,
   mutate(month = as.numeric(substr(date, 5, 6)))
 
 # administrative unit boundaries
-adm2_boundaries = sf::read_sf("./01_data/1c_support/adm_boundaries/geoBoundariesCGAZ_ADM2.geojson")
-adm0_boundaries = sf::read_sf("./01_data/1c_support/adm_boundaries/geoBoundariesCGAZ_ADM0.geojson") %>%
-  filter(shapeGroup != "ATA")
+adm2_boundaries = load_adm2_boundaries()
+adm0_boundaries = load_adm0_boundaries()
 
 # person-day exposure
 pday_tc_2024 = readr::read_csv("./01_data/1d_summary/processed_pday_exp_data/pday_tc_exp_2024.csv")[, -1]
@@ -49,7 +49,7 @@ adm2_nz_tc_exp = merge(adm2_boundaries, pday_tc_2024, by.x = "shapeID", by.y = "
 adm2_nz_hurr_exp = merge(adm2_boundaries, pday_hurr_2024, by.x = "shapeID", by.y = "ADM2_id") %>% 
   filter(total_person_day_exposure != 0)
 
-# 0d. Filter hurricane tracks that meet 1) cyclonic storm and 2) hurricane/typhoon 
+# 0d. Filter hurricane tracks that meet 1) tropical cyclones and 2) hurricane/typhoon 
 # threshold
 global_storm_winds_2024 = readRDS("./01_data/1a_raw/global_hurr_dat/global_storm_winds_2024.csv")
 tc_track_names = global_storm_winds_2024 %>% 
@@ -90,7 +90,7 @@ x = ggplot() +
             fontface = "bold",
             color = "black") +
   scale_color_viridis_c(option = "mako",
-                    #    direction = -1,
+                        #    direction = -1,
                         name = "Month", 
                         breaks = 1:12, 
                         limits = c(1, 12),
@@ -135,7 +135,7 @@ y = ggplot() +
             fontface = "bold",
             color = "black") +
   scale_color_viridis_c(option = "mako", 
-                      #  direction = -1,
+                        #  direction = -1,
                         name = "Month", 
                         breaks = 1:12, 
                         limits = c(1, 12),

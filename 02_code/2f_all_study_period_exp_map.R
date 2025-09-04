@@ -2,29 +2,11 @@
 rm(list=ls())
 
 ### Load person-day exposure
+source("./02_code/20_setup/01_helper_functions.R")
 ## Tropical cyclones
-all_pday_tc_exp <- list()
-for (year in 1980:2024) {
-  # load person-day exposures
-  pday_tc_exp = readr::read_csv(paste0("./01_data/processed_pday_exp_data/pday_tc_exp_",
-                                       year, ".csv")) %>% 
-    mutate(year = year)
-  all_pday_tc_exp[[as.character(year)]] <- pday_tc_exp
-}
-all_pday_tc_exp <- bind_rows(all_pday_tc_exp)[, -1] %>%
-  filter(if_all(everything(), ~ !is.na(.))) # if NA, assumes population = 0, can exclude from analysis
-
+all_pday_tc_exp = load_person_day_exposures(type = "tc")
 ## Hurricanes
-all_pday_hurr_exp = list()
-for (year in 1980:2024) {
-  # load person-day exposures
-  pday_hurr_exp = readr::read_csv(paste0("./01_data/processed_pday_exp_data/pday_hurr_exp_",
-                                         year, ".csv")) %>% 
-    mutate(year = year)
-  all_pday_hurr_exp[[as.character(year)]] <- pday_hurr_exp
-}
-all_pday_hurr_exp <- bind_rows(all_pday_hurr_exp)[, -1] %>%
-  filter(if_all(everything(), ~ !is.na(.)))
+all_pday_hurr_exp = load_person_day_exposures(type = "hurr")
 
 # 1a. Summarize total person-day exposure for world
 total_tc_exp_days = all_pday_tc_exp %>%
@@ -36,9 +18,8 @@ total_hurr_exp_days = all_pday_hurr_exp %>%
   summarise(sum_exp_days = sum(total_exposure_days))
 
 # Administrative unit boundaries
-adm2_boundaries = sf::read_sf("./01_data/adm_boundaries/geoBoundariesCGAZ_ADM2.geojson")
-adm0_boundaries = sf::read_sf("./01_data/adm_boundaries/geoBoundariesCGAZ_ADM0.geojson") %>%
-  filter(shapeGroup != "ATA")
+adm2_boundaries <- load_adm2_boundaries()
+adm0_boundaries <- load_adm0_boundaries()
 
 adm2_nz_tc_exp = merge(adm2_boundaries, total_tc_exp_days, 
                        by.x = "shapeID", by.y = "ADM2_id") %>% 
@@ -67,7 +48,7 @@ x = ggplot() +
         axis.ticks = element_blank(),
         legend.position = "bottom",
         legend.direction = "horizontal")
-ggsave("./03_output/global_tc_exp_days_map.jpg", x, 
+ggsave("./03_output/3e_pday_exp_through_years_map/global_tc_exp_days_map.jpg", x, 
        dpi = 1000, width = 12, height = 6)
 
 y = ggplot() +
@@ -86,5 +67,5 @@ y = ggplot() +
         axis.ticks = element_blank(),
         legend.position = "bottom",
         legend.direction = "horizontal")
-ggsave("./03_output/global_hurr_exp_days_map.jpg", y, 
+ggsave("./03_output/3e_pday_exp_through_years_map/global_hurr_exp_days_map.jpg", y, 
        dpi = 1000, width = 12, height = 6)

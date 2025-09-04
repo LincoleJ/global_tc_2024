@@ -2,10 +2,9 @@
 rm(list=ls())
 
 # 0. Load data
-admin2_units = sf::read_sf("./01_data/1c_support/adm_boundaries/geoBoundariesCGAZ_ADM2.geojson")
-adm2_key = data.frame(shapeID = admin2_units$shapeID,
-                      ctry_code = admin2_units$shapeGroup,
-                      shapeName = admin2_units$shapeName) %>%
+source("./02_code/20_setup/01_helper_functions.R")
+admin2_units <- load_adm2_lookup()  
+adm2_key = admin2_units %>%
   distinct()
 year = 2024
 storm_track_dat = readRDS(paste0("./01_data/1a_raw/global_hurr_dat/global_storm_winds_", year, ".csv"))
@@ -70,3 +69,10 @@ top10_hurr_storms = person_day_hurr_exposure %>%
   select(storm_id, ctry_code) %>%
   distinct()
 
+# 2. Save to shiny_app/ folder for implementation
+# Define the output directory
+output_dir <- "./shiny_app/processed_data_v4/"
+
+# Save the summarized storm data
+saveRDS(tc_pday_by_storm, file.path(output_dir, "tc_pday_by_storm.rds"))
+saveRDS(hurr_pday_by_storm, file.path(output_dir, "hurr_pday_by_storm.rds"))

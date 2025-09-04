@@ -8,7 +8,7 @@ library(countrycode)
 # 1. Generate person-day exposures for a) TC and b) Hurricane exposures
 for (year in 1980:2024) {
   ## hurricane tracks
-  storm_track_dat = readRDS(paste0("./01_data/global_hurr_dat/global_storm_winds_", year, ".csv"))
+  storm_track_dat = readRDS(paste0("./01_data/1a_raw/global_hurr_dat/global_storm_winds_", year, ".csv"))
   tc_exposures <- storm_track_dat %>% filter(vmax_sust >= 17.4911)
   hurr_exposures = storm_track_dat %>% filter(vmax_sust >= 32.9244)
   
@@ -18,7 +18,7 @@ for (year in 1980:2024) {
   
   ## population
   if (year < 2020) {
-    adm2_pop = readr::read_csv(paste0("./01_data/pop_by_adm2_interpolated/adm2_pop_", year, ".csv"))[, -1] 
+    adm2_pop = readr::read_csv(paste0("./01_data/1b_intermediate/pop_by_adm2_interpolated/adm2_pop_", year, ".csv"))[, -1] 
     colnames(adm2_pop) = c("shapeID", "pop")
     
     # join population data with storm wind data
@@ -46,11 +46,11 @@ for (year in 1980:2024) {
     
     # 2. Save datasets
     write.csv(person_day_tc_exposure, 
-              paste0("./01_data/processed_pday_exp_data/pday_tc_exp_", year, ".csv"))
+              paste0("./01_data/1d_summary/processed_pday_exp_data/pday_tc_exp_", year, ".csv"))
     write.csv(person_day_hurr_exposure,
-              paste0("./01_data/processed_pday_exp_data/pday_hurr_exp_", year, ".csv"))
+              paste0("./01_data/1d_summary/processed_pday_exp_data/pday_hurr_exp_", year, ".csv"))
   } else {
-    adm2_pop = readr::read_csv(paste0("./01_data/pop_by_adm2_interpolated/adm2_pop_", 2020, ".csv"))[, -1] 
+    adm2_pop = readr::read_csv(paste0("./01_data/1b_intermediate/pop_by_adm2_interpolated/adm2_pop_", 2020, ".csv"))[, -1] 
     colnames(adm2_pop) = c("shapeID", "pop")
     
     # join population data with storm wind data
@@ -78,8 +78,8 @@ for (year in 1980:2024) {
     
     # 2. Save datasets
     write.csv(person_day_tc_exposure, 
-              paste0("./01_data/processed_pday_exp_data/pday_tc_exp_", year, ".csv"))
+              paste0("./01_data/1d_summary/processed_pday_exp_data/pday_tc_exp_", year, ".csv"))
     write.csv(person_day_hurr_exposure,
-              paste0("./01_data/processed_pday_exp_data/pday_hurr_exp_", year, ".csv"))
+              paste0("./01_data/1d_summary/processed_pday_exp_data/pday_hurr_exp_", year, ".csv"))
   }
 }

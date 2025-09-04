@@ -3,26 +3,20 @@ rm(list=ls())
 
 # 0a. Load packages
 library(dplyr)
+library(tidyr)
+library(sf)
 
 # 0b. Load datasets
 # Administrative unit boundaries
-adm2_boundaries = sf::read_sf("./01_data/1c_support/adm_boundaries/geoBoundariesCGAZ_ADM2.geojson")
+source("./02_code/00_setup/01_helper_functions.R")
+adm2_boundaries = load_adm2_boundaries()
 
 # person-day exposure
 pday_tc_2024 = readr::read_csv("./01_data/1d_summary/processed_pday_exp_data/pday_tc_exp_2024.csv")[, -1]
 pday_hurr_2024 = readr::read_csv("./01_data/1d_summary/processed_pday_exp_data/pday_hurr_exp_2024.csv")[ -1]
 
 # WHO region
-library(countrycode)
-who_key = readr::read_csv("./01_data/1c_support/who-regions/who-regions.csv") %>%
-  mutate(`World regions according to WHO` = 
-           stringr::str_remove(`World regions according to WHO`, " \\(WHO\\)"))
-colnames(who_key) = c("country", "ctry_code", "year", "who_region")
-adm2_key = data.frame(shapeID = adm2_boundaries$shapeID,
-                      ctry_code = adm2_boundaries$shapeGroup) %>%
-  distinct()
-adm2_key = left_join(adm2_key, who_key, by = c("ctry_code"))
-adm2_key = adm2_key %>% select(shapeID, who_region)
+adm2_key = load_adm2_who_mapping()
 
 # 1. Merge exposure data with ADM2 boundary and filter non-zero exposures
 adm2_nz_tc_exp = merge(adm2_boundaries, pday_tc_2024, by.x = "shapeID", by.y = "ADM2_id") %>% 

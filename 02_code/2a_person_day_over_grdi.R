@@ -6,8 +6,9 @@ library(ggplot2)
 library(dplyr)
 library(patchwork)
 
-# 0b. Load data
-## population (Tory's method)
+# 0b. Load data / source code
+source("./02_code/20_setup/01_helper_functions.R")
+## population (from Tory's method)
 pop_2020 = readr::read_csv("./01_data/1a_raw/pop_data_by_adm2/pop_2020_by_adm2.csv")[, -1] 
 colnames(pop_2020) = c("shapeID", "pop")
 
@@ -24,18 +25,8 @@ hurr_exposures_2024 = hurr_exposures_2024 %>% mutate(day = as.Date(date_time_max
 # GRDI
 grdi_dat = arrow::read_feather("./01_data/1a_raw/pop_wt_grdi_data/pop_wt_grdi_2020.feather") 
 
-## WHO region
-library(countrycode)
-who_key = readr::read_csv("./01_data/1c_support/who-regions/who-regions.csv") %>%
-  mutate(`World regions according to WHO` = 
-           stringr::str_remove(`World regions according to WHO`, " \\(WHO\\)"))
-colnames(who_key) = c("country", "ctry_code", "year", "who_region")
-admin2_units = sf::read_sf("./01_data/1c_support/adm_boundaries/geoBoundariesCGAZ_ADM2.geojson")
-adm2_key = data.frame(shapeID = admin2_units$shapeID,
-                      ctry_code = admin2_units$shapeGroup) %>%
-  distinct()
-adm2_key = left_join(adm2_key, who_key, by = c("ctry_code"))
-adm2_key = adm2_key %>% select(shapeID, who_region)
+# ADM2 reference key
+adm2_key = load_adm2_who_mapping()
 
 # 0c. merge everything
 tc_exposures_2024 = left_join(tc_exposures_2024, adm2_key, by = c("ADM2_id" = "shapeID"))
@@ -75,6 +66,7 @@ hurr_grdi = hurr_grdi %>%
   mutate(region = ifelse(country == "Taiwan, Province of China", "Western Pacific", region)) %>%
   mutate(region = ifelse(country == "Saint Vincent and the Grenadines", "Americas", region))
 
+# save for use later
 write.csv(tc_grdi, "./01_data/1d_summary/tc_grdi.csv")
 write.csv(hurr_grdi, "./01_data/1d_summary/hurr_grdi.csv")
 
@@ -134,9 +126,9 @@ ggsave("./03_output/3a_pday_exp_vs_grdi/fig2.jpg", fig2,
        width = 8, height = 12)
 
 
-# 1a. pinpointing Madagascar
+# Appendix pinpointing Madagascar (for Tory)
 fig1_a_mdg <- ggplot(tc_grdi, aes(x = pop_wt_grdi, 
-                              y = log_person_day_exposure)) +
+                                  y = log_person_day_exposure)) +
   geom_point(data = subset(tc_grdi, country != "Madagascar"), 
              aes(color = region), alpha = 0.7) +
   geom_point(data = subset(tc_grdi, country == "Madagascar"), 
@@ -150,10 +142,3 @@ fig1_a_mdg <- ggplot(tc_grdi, aes(x = pop_wt_grdi,
   theme_minimal() +
   xlim(0, 100) +
   ylim(-2, 17)
-
-# 2. Get region-specific person-day exposure sums
-View(tc_grdi)
-# for tropical cyclones
-tc_summary = tc_grdi %>% 
-  group_by(region) %>% 
-  summarise(region_pday_exp = sum(person_day_exposure)) 
