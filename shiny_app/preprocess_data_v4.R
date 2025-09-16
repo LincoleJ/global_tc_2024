@@ -19,6 +19,9 @@ pday_hurr_2024 <- readr::read_csv("./01_data/1d_summary/processed_pday_exp_data/
 grdi_dat_raw <- arrow::read_feather("./01_data/1a_raw/pop_wt_grdi_data/pop_wt_grdi_2020.feather")
 global_storm_winds_2024 <- readRDS("./01_data/1a_raw/global_hurr_dat/global_storm_winds_2024.csv")
 
+source("./02_code/20_setup/01_helper_functions.R")
+who_regions <- load_adm2_who_mapping() %>% 
+  select(shapeID, who_region)
 
 # ========================================
 # 2. ### OPTIMIZATION ### SIMPLIFY GEOMETRIES IMMEDIATELY
@@ -40,10 +43,10 @@ cat("Processing track and GRDI data...\n")
 grdi_quantiles <- quantile(grdi_dat_raw$pop_wt_grdi, probs = c(0.25, 0.5, 0.75), na.rm = TRUE)
 grdi_dat <- grdi_dat_raw %>%
   mutate(quartile = case_when(
-    pop_wt_grdi <= grdi_quantiles[1] ~ "low",
-    pop_wt_grdi > grdi_quantiles[1] & pop_wt_grdi <= grdi_quantiles[2] ~ "moderately low",
-    pop_wt_grdi > grdi_quantiles[2] & pop_wt_grdi <= grdi_quantiles[3] ~ "moderately high",
-    pop_wt_grdi > grdi_quantiles[3] ~ "high"
+    pop_wt_grdi <= grdi_quantiles[1] ~ "Low",
+    pop_wt_grdi > grdi_quantiles[1] & pop_wt_grdi <= grdi_quantiles[2] ~ "Moderately low",
+    pop_wt_grdi > grdi_quantiles[2] & pop_wt_grdi <= grdi_quantiles[3] ~ "Moderately high",
+    pop_wt_grdi > grdi_quantiles[3] ~ "High"
   ))
 
 # --- Track Processing ---
@@ -92,6 +95,7 @@ adm2_tc_exp_wgs84 <- adm2_boundaries %>%
   left_join(grdi_dat, by = "shapeID") %>%
   left_join(adm2_tc_storms, by = c("shapeID" = "ADM2_id")) %>%
   mutate(log_exposure = log10(total_person_day_exposure + 0.1)) %>%
+  left_join(who_regions, by = c("shapeID" = "shapeID")) %>%
   st_transform(4326)
 
 # --- Hurricane Data ---
@@ -101,6 +105,7 @@ adm2_hurr_exp_wgs84 <- adm2_boundaries %>%
   left_join(grdi_dat, by = "shapeID") %>%
   left_join(adm2_ht_storms, by = c("shapeID" = "ADM2_id")) %>%
   mutate(log_exposure = log10(total_person_day_exposure + 0.1)) %>%
+  left_join(who_regions, by = c("shapeID" = "shapeID")) %>%
   st_transform(4326)
 
 # ========================================
@@ -115,7 +120,7 @@ app_tc_exp <- adm2_tc_exp_wgs84 %>%
     shapeName, country, shapeGroup,
     total_person_day_exposure, log_exposure, total_population,
     pop_wt_grdi, quartile,
-    contributing_storms
+    contributing_storms, who_region
   )
 
 app_hurr_exp <- adm2_hurr_exp_wgs84 %>%
@@ -123,7 +128,7 @@ app_hurr_exp <- adm2_hurr_exp_wgs84 %>%
     shapeName, country, shapeGroup,
     total_person_day_exposure, log_exposure, total_population,
     pop_wt_grdi, quartile,
-    contributing_storms
+    contributing_storms, who_region
   )
 
 app_tc_tracks <- tc_tracks_2024 %>%
