@@ -44,20 +44,20 @@ ui <- dashboardPage(
     # logos
     tags$li(class = "dropdown",
             tags$a(href = "https://sparklabnyc.github.io/site/gtropic.html", target = "_blank",
-                   tags$img(src = "g-tropic_logo.jpeg", height = "30px", 
-                            style = "margin-top: 10px; margin-right: 15px;")
+                   tags$img(src = "g-tropic_logo.jpeg", height = "18px", 
+                            style = "margin-top: 0.1px; margin-right: 0.1px;")
             )
     ),
     tags$li(class = "dropdown", 
             tags$a(href = "https://sparklabnyc.github.io/site/home.html", target = "_blank",
-                   tags$img(src = "sparklabnyc_logo.jpg", height = "30px", 
-                            style = "margin-top: 0.1px; margin-right: 5px;")
+                   tags$img(src = "sparklabnyc_logo.jpg", height = "18px", 
+                            style = "margin-top: 0.1px; margin-right: 0.1px;")
             )
     ),
     tags$li(class = "dropdown",
             tags$a(href = "https://www.publichealth.columbia.edu/", target = "_blank",
-                   tags$img(src = "Mailman_Horizontal_White.png", height = "30px", 
-                            style = "margin-top: 10px; margin-right: 15px;")
+                   tags$img(src = "Mailman_Horizontal_White.png", height = "18px", 
+                            style = "margin-top: 0.1px; margin-right: 0.1px;")
             )
     )
     ),
@@ -141,18 +141,17 @@ ui <- dashboardPage(
     
     fluidRow(
       column(12, 
-             # Box 1: Top regions table
+             # Box 1: Top areas affected table
              column(6,
                     box(
                       title = "Affected areas (second-level administrative units)",
                       width = 12, status = "primary", solidHeader = TRUE,
-                      # Add a height for better alignment
                       height = "450px", 
                       DT::dataTableOutput("top_regions")
                     )
              ),
              
-             # Box 2: Top Storms Table
+             # Box 2: Top contributing storms table
              column(6,
                     box(
                       title = "Contributing storms",
@@ -204,7 +203,7 @@ server <- function(input, output, session) {
     countries <- sort(countries)
     
     updateSelectInput(session, "country_filter",  # Note: country_filter, not who_region
-                      choices = c("All countries" = "all", setNames(countries, countries)))
+                      choices = c("All countries/territories" = "all", setNames(countries, countries)))
   })
   
   exposure_data <- reactive({
@@ -362,18 +361,33 @@ server <- function(input, output, session) {
     exposure_data() %>%
       st_drop_geometry() %>%
       arrange(desc(total_person_day_exposure)) %>%
+      mutate(Rank = row_number()) %>%
       transmute(
+        Rank = Rank,
         Area = shapeName,
-        `Country / Territory` = ifelse(!is.na(country), country, shapeGroup),
+        `Country/Territory` = ifelse(!is.na(country), country, shapeGroup),
+        Cyclones = sapply(contributing_storms, function(s) {
+          if(length(s) > 0 && !is.na(s[1])) {
+            storms_list <- paste(s, collapse = ", ")
+            storms_list
+          } else {
+            "N/A"
+          }
+        }),
         `Person-day exposure` = format(round(total_person_day_exposure, -1), big.mark = ",")
       ) %>%
       DT::datatable(
         options = list(
           pageLength = -1,  # show all rows
-          scrollY = "300px",  # fixed height
+          scrollY = "300px",  # fixed height same as storm table
+          scrollX = TRUE,
           scrollCollapse = TRUE,
           dom = 'ft',  # 'f' for filter/search, 't' for table only
-          order = list(list(2, 'desc'))  # sort by person-day exposure column
+          order = list(list(0, 'asc')),
+          columnDefs = list(
+            list(className = 'dt-center', targets = 0)
+            ),  # center align Rank
+          autoWidth = FALSE
         ), 
         rownames = FALSE
       )
@@ -392,17 +406,22 @@ server <- function(input, output, session) {
     # Read the data and format the table
     readRDS(storm_file) %>%
       arrange(desc(total_pday)) %>%
+      mutate(Rank = row_number()) %>%
       transmute(
-        `Storm` = storm_id,
-        `Total person-day exposure` = format(round(total_pday, -1), big.mark = ","),
-        `Countries affected` = countries_affected
+        Rank = Rank,
+        `Cyclone` = storm_id,
+        `Countries/Territories affected` = countries_affected,
+        `Person-day exposure` = format(round(total_pday, -1), big.mark = ",")
       ) %>%
       DT::datatable(
         options = list(pageLength = -1, 
                        scrollY = "300px",
                        scrollCollapse = TRUE,
                        dom = "ft",
-                       order = list(list(1, "desc"))
+                       order = list(list(0, "asc")),
+                       columnDefs = list(
+                         list(className = 'dt-center', targets = 0)  # center align the Rank column
+                       )
         ), 
         rownames = FALSE
       )
