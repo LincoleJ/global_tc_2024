@@ -1,4 +1,4 @@
-# Characterizing global tropical cyclone events of 2024
+# Characterizing global tropical cyclone events of 2024 in historical and sociodemographic context
 
 Lingke Jiang, Victoria D. Lynch, G. Brooke Anderson, Xiao Wu, Robbie M. Parks
 
