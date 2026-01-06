@@ -86,6 +86,7 @@ Supplementary sensitivity analysis
 │   ├── 2d_rank_storms.R
 │   ├── 2e_pday_exp_year_reg.R
 │   ├── 2f_all_study_period_exp_map.R
+│   ├── 2i_temporal_trend_by_region.R
 ├── 03_output
 │   ├── 3a_pday_exp_vs_grdi
 │   │   ├── pday_exp_vs_grdi.jpg
