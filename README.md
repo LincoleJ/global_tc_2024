@@ -1,10 +1,12 @@
 # Characterizing global tropical cyclone events of 2024
 
-Work in progress by Lingke Jiang, Victoria D. Lynch, G. Brooke Anderson, Xiao Wu, Robbie M. Parks
+Lingke Jiang, Victoria D. Lynch, G. Brooke Anderson, Xiao Wu, Robbie M. Parks
 
 ## Project description
 
-The dataset and code used for paper to characterize global tropical cyclone events of 2024.
+The dataset and code used for paper 
+
+[[LINK]]
 
 ## 1. Data
 
