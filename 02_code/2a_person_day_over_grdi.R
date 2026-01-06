@@ -1,4 +1,4 @@
-# generate log-person day exposure vs population-weighted GRDI, colored by 
+# generate log-person day exposure vs population-weighted GRDI, colored by region
 rm(list = ls())
 
 # 0a. Load packages
@@ -66,9 +66,9 @@ hurr_grdi = hurr_grdi %>%
   mutate(region = ifelse(country == "Taiwan, Province of China", "Western Pacific", region)) %>%
   mutate(region = ifelse(country == "Saint Vincent and the Grenadines", "Americas", region))
 
-# save for use later
-write.csv(tc_grdi, "./01_data/1d_summary/tc_grdi.csv")
-write.csv(hurr_grdi, "./01_data/1d_summary/hurr_grdi.csv")
+# # save for use later
+# write.csv(tc_grdi, "./01_data/1d_summary/tc_grdi.csv")
+# write.csv(hurr_grdi, "./01_data/1d_summary/hurr_grdi.csv")
 
 # 2. Scatter plot for tropical cyclone exposures
 # color is from official website
@@ -85,7 +85,7 @@ fig1_a = ggplot(tc_grdi, aes(x = pop_wt_grdi,
   scale_y_log10(breaks = 10^seq(0, 8, by = 1),
                 labels = scales::label_comma()) +
   scale_color_manual(values = region_colors) +
-  labs(y = "Person-day cyclonic storm exposure",
+  labs(y = "Person-day tropical cyclone-force exposure",
        color = "Region") +
   theme_minimal() +
   theme(panel.grid = element_blank(),
@@ -100,7 +100,7 @@ fig1_b = ggplot(hurr_grdi, aes(x = pop_wt_grdi,
   geom_point(show.legend = FALSE) +
   scale_y_log10(breaks = 10^seq(1, 8, by = 1),
                 labels = scales::label_comma()) +
-  labs(y = "Person-day hurricane / typhoon exposure",
+  labs(y = "Person-day hurricane-force exposure",
        color = "Region") +
   scale_color_manual(values = region_colors) +
   theme_minimal() +
@@ -121,10 +121,12 @@ axis_title <- ggplot(data.frame(x = c(0, 1)), aes(x = x)) +
 fig2 = (fig1_a / fig1_b / axis_title) + 
   plot_layout(guides = "collect",
               heights = c(20, 20, 1)) &
-  theme(legend.position = "right")
-ggsave("./03_output/3a_pday_exp_vs_grdi/fig2.jpg", fig2,
-       width = 8, height = 12)
-
+  theme(legend.position = "right", 
+        text = element_text(size = 16))
+ggsave("./03_output/3a_pday_exp_vs_grdi/pday_exp_vs_grdi.jpg", fig2,
+       width = 8, height = 12, dpi = 2000)
+ggsave("./03_output/3a_pday_exp_vs_grdi/pday_exp_vs_grdi_hurr.jpg", fig1_b, 
+       width = 8, height = 6, dpi = 2000)
 
 # Appendix pinpointing Madagascar (for Tory)
 fig1_a_mdg <- ggplot(tc_grdi, aes(x = pop_wt_grdi, 
@@ -142,3 +144,59 @@ fig1_a_mdg <- ggplot(tc_grdi, aes(x = pop_wt_grdi,
   theme_minimal() +
   xlim(0, 100) +
   ylim(-2, 17)
+
+
+# Make plots by region
+# Base plot function
+make_plot <- function(dat, reg, type, show_y = TRUE) {
+  color <- region_colors[reg]
+  type_label <- ifelse(type == "TC", "Tropical cyclone-force exposed areas", 
+                       "Hurricane-force exposed areas")
+  
+  p <- ggplot(dat, aes(x = pop_wt_grdi, y = person_day_exposure)) +
+    geom_point(color = color, alpha = 0.6) +
+    scale_y_log10(limits = c(1, 1e8),
+                  breaks = 10^seq(0, 8, by = 2),
+                  labels = scales::label_comma()) +
+    scale_x_continuous(limits = c(0, 100)) +
+    labs(title = paste0(reg, " - ", type_label), x = NULL, y = NULL) +
+    theme_minimal() +
+    theme(panel.grid = element_blank(),
+          axis.line = element_line(),
+          plot.title = element_text(size = 10, hjust = 0.5))
+  
+  if (!show_y) {
+    p <- p + theme(axis.text.y = element_blank())
+  }
+  return(p)
+}
+
+# Create all 8 plots
+wp_tc <- make_plot(tc_grdi %>% filter(region == "Western Pacific"), "Western Pacific", "TC")
+wp_hurr <- make_plot(hurr_grdi %>% filter(region == "Western Pacific"), "Western Pacific", "Hurr", show_y = FALSE)
+am_tc <- make_plot(tc_grdi %>% filter(region == "Americas"), "Americas", "TC")
+am_hurr <- make_plot(hurr_grdi %>% filter(region == "Americas"), "Americas", "Hurr", show_y = FALSE)
+af_tc <- make_plot(tc_grdi %>% filter(region == "Africa"), "Africa", "TC")
+af_hurr <- make_plot(hurr_grdi %>% filter(region == "Africa"), "Africa", "Hurr", show_y = FALSE)
+sea_tc <- make_plot(tc_grdi %>% filter(region == "South-East Asia"), "South-East Asia", "TC")
+eu_tc <- make_plot(tc_grdi %>% filter(region == "Europe"), "Europe", "TC", show_y = FALSE)
+
+# Combine into grid
+fig_s3 <- (wp_tc | wp_hurr) /
+  (am_tc | am_hurr) /
+  (af_tc | af_hurr) /
+  (sea_tc | eu_tc) &
+  theme(text = element_text(size = 12))
+
+# Add axis labels using gridExtra
+library(grid)
+library(gridExtra)
+
+fig_s3_final <- grid.arrange(
+  patchworkGrob(fig_s3),
+  left = textGrob("Person-day exposure", rot = 90, gp = gpar(fontsize = 14)),
+  bottom = textGrob("Global Gridded Relative Deprivation Index", gp = gpar(fontsize = 14))
+)
+
+ggsave("./03_output/3a_pday_exp_vs_grdi/fig_s3_grdi_by_region.jpg", fig_s3_final,
+       width = 8, height = 12, dpi = 2000)

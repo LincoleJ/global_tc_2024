@@ -107,39 +107,41 @@ total_pday_hurr_exp_ctry = total_pday_hurr_exp_ctry %>%
 #-----------------------------------------------------------------------------
 # 2a. global plot
 pday_tc_global_plot = ggplot(total_pday_tc_exp, aes(x = sum_pday_exp, 
-                                                    y = as.factor(year))) +
+                                                    y = 1)) +
   geom_jitter(data = filter(total_pday_tc_exp, year != 2024),
               aes(color = year),
-              width = 0, height = 0.2, size = 2, shape = 16) + 
+              width = 0, height = 0.3, size = 2, shape = 16) + 
   geom_jitter(data = filter(total_pday_tc_exp, year == 2024),
-              color = "#FF7F0E", width = 0, height = 0.2, size = 4, shape = 16) +
-  scale_x_log10(limits = c(c(1, 1e9)), 
+              color = "#FF7F0E", width = 0, height = 0.3, size = 4, shape = 16) +
+  scale_x_log10(limits = c(1, 2e9), 
                 breaks = c(1e3, 1e5, 1e7, 1e9),
                 labels = label_comma()) +
+  scale_y_continuous(limits = c(0.5, 1.5)) +
   scale_color_gradient(low = "plum1", high = "purple4", 
                        labels = NULL, guide = "none") +
   labs(x = NULL,
        y = "Worldwide") +
   theme_minimal() +
-  theme(axis.text.y = element_blank(),
-        axis.text.x = element_blank(),
-        panel.grid.major.x = element_blank(),
-        panel.grid.minor.x = element_blank(),
-        panel.grid.major.y = element_blank(),
-        legend.position = "none") + 
-  coord_cartesian(clip = "off")
+theme(axis.text.y = element_blank(),
+      axis.text.x = element_blank(),
+      panel.grid.major.x = element_blank(),
+      panel.grid.minor.x = element_blank(),
+      panel.grid.major.y = element_blank(),
+      panel.grid.minor.y = element_blank(),
+      legend.position = "none")
 
 pday_hurr_global_plot = ggplot(total_pday_hurr_exp, aes(x = sum_pday_exp, 
-                                                        y = as.factor(year))) +
+                                                        y = 1)) +
   geom_jitter(data = filter(total_pday_hurr_exp, year != 2024),
               aes(color = year),
-              width = 0, height = 0.2,
+              width = 0, height = 0.3,
               size = 2, shape = 16) +
   geom_jitter(data = filter(total_pday_hurr_exp, year == 2024),
-              color = "#FF7F0E", width = 0, height = 0.2, size = 4, shape = 16) +
-  scale_x_log10(limits = c(c(1, 1e9)), 
+              color = "#FF7F0E", width = 0, height = 0.3, size = 4, shape = 16) +
+  scale_x_log10(limits = c(c(1, 2e9)), 
                 breaks = c(1e3, 1e6, 1e9),
                 labels = label_comma()) +
+  scale_y_continuous(limits = c(0.5, 1.5)) +
   scale_color_gradient(low = "plum1", high = "purple4", 
                        labels = NULL, guide = "none") +
   labs(x = NULL,
@@ -150,8 +152,8 @@ pday_hurr_global_plot = ggplot(total_pday_hurr_exp, aes(x = sum_pday_exp,
         panel.grid.major.x = element_blank(),
         panel.grid.minor.x = element_blank(),
         panel.grid.major.y = element_blank(),
-        legend.position = "none") + 
-  coord_cartesian(clip = "off")
+        panel.grid.minor.y = element_blank(),
+        legend.position = "none")
 
 # 2b. plot according to WHO region
 pday_tc_who_plot = ggplot(total_pday_tc_exp_who, 
@@ -162,7 +164,7 @@ pday_tc_who_plot = ggplot(total_pday_tc_exp_who,
   geom_jitter(data = filter(total_pday_tc_exp_who, year == 2024),
               color = "#FF7F0E", 
               width = 0, height = 0.01, size = 4) +
-  scale_x_log10(limits = c(c(1, 1e9)), 
+  scale_x_log10(limits = c(c(1, 2e9)), 
                 breaks = c(1e3, 1e6, 1e9),
                 labels = label_comma()) +
   scale_color_gradient(low = "plum1", high = "purple4", guide = "none") +
@@ -172,8 +174,7 @@ pday_tc_who_plot = ggplot(total_pday_tc_exp_who,
   theme(legend.position = "none",
         axis.text.x = element_blank(),
         panel.grid.major.x = element_blank(),
-        panel.grid.minor.x = element_blank()) +
-  coord_cartesian(clip = "off")
+        panel.grid.minor.x = element_blank()) 
 
 pday_hurr_who_plot = ggplot(total_pday_hurr_exp_who, 
                             aes(x = sum_pday_hurr_exp, y = who_region)) +
@@ -183,7 +184,7 @@ pday_hurr_who_plot = ggplot(total_pday_hurr_exp_who,
   geom_jitter(data = filter(total_pday_hurr_exp_who, year == 2024),
               color = "#FF7F0E",
               width = 0, height = 0.01, size = 4) +
-  scale_x_log10(limits = c(c(1, 1e9)), 
+  scale_x_log10(limits = c(c(1, 2e9)), 
                 breaks = c(1e3, 1e6, 1e9),
                 labels = label_comma()) +
   scale_color_gradient(low = "plum1", high = "purple4", guide = "none") +
@@ -193,8 +194,7 @@ pday_hurr_who_plot = ggplot(total_pday_hurr_exp_who,
   theme(legend.position = "none",
         axis.text.x = element_blank(),
         panel.grid.major.x = element_blank(),
-        panel.grid.minor.x = element_blank()) +
-  coord_cartesian(clip = "off")
+        panel.grid.minor.x = element_blank()) 
 
 # 2c. Plot for each country
 pday_tc_ctry_plot <- ggplot(total_pday_tc_exp_ctry, aes(x = sum_pday_exp, y = country)) +
@@ -207,18 +207,17 @@ pday_tc_ctry_plot <- ggplot(total_pday_tc_exp_ctry, aes(x = sum_pday_exp, y = co
   geom_jitter(data = filter(total_pday_tc_exp_ctry, year == 2024),
               color = "#FF7F0E",
               width = 0, height = 0.001, size = 4) +
-  scale_x_log10(limits = c(c(1, 1e9)), 
+  scale_x_log10(limits = c(c(1, 2e9)), 
                 breaks = c(1e3, 1e6, 1e9),
                 labels = label_comma()) +
   scale_color_gradient(low = "plum1", high = "purple4") +
-  labs(x = "Person-day cyclonic storm exposure", 
+  labs(x = "Person-day tropical cyclone-force exposure", 
        y = "Country / Territory",
        color = "Year") +
   theme_minimal() + 
   theme(legend.position = "none",
         panel.grid.major.x = element_blank(),
-        panel.grid.minor.x = element_blank()) +
-  coord_cartesian(clip = "off")
+        panel.grid.minor.x = element_blank()) 
 
 pday_hurr_ctry_plot <- ggplot(total_pday_hurr_exp_ctry, aes(x = sum_pday_exp, y = country)) +
   geom_jitter(data = filter(total_pday_hurr_exp_ctry, year != 2024),
@@ -227,34 +226,34 @@ pday_hurr_ctry_plot <- ggplot(total_pday_hurr_exp_ctry, aes(x = sum_pday_exp, y 
   geom_jitter(data = filter(total_pday_hurr_exp_ctry, year == 2024),
               color = "#FF7F0E",
               width = 0, height = 0.01, size = 4) +
-  scale_x_log10(limits = c(c(1, 1e9)), 
+  scale_x_log10(limits = c(c(1, 2e9)), 
                 breaks = c(1e3, 1e6, 1e9),
                 labels = label_comma()) +
   scale_color_gradient(low = "plum1", high = "purple4", 
                        labels = NULL, guide = "none") +
-  labs(x = "Person-day hurricane / typhoon exposure",
+  labs(x = "Person-day hurricane-force exposure",
        y = "Country / Territory") +
   theme_minimal() + 
   theme(legend.position = "none",
         panel.grid.major.x = element_blank(),
-        panel.grid.minor.x = element_blank()) +
-  coord_cartesian(clip = "off")
+        panel.grid.minor.x = element_blank()) 
 
 ###########------------------------------------------------------------------------
 # 3. Putting each plot together
 tc_plot = (pday_tc_global_plot / pday_tc_who_plot / pday_tc_ctry_plot) +
-  plot_layout(heights = c(1, 3, 15))
+  plot_layout(heights = c(1.5, 3, 15))
 
 ht_plot = (pday_hurr_global_plot / pday_hurr_who_plot / pday_hurr_ctry_plot) +
-  plot_layout(heights = c(1, 3, 15))
+  plot_layout(heights = c(1.5, 3, 15))
 
 fig3 = (pday_tc_global_plot / pday_tc_who_plot / pday_tc_ctry_plot /
           pday_hurr_global_plot / pday_hurr_who_plot / pday_hurr_ctry_plot) + 
   plot_layout(guides = "collect",
               ncol = 1, nrow = 6,
-              heights = c(1, 3, 15, 1, 3, 15)) &
-  theme(legend.position = "right")
+              heights = c(1.5, 3, 15, 1.5, 5, 13)) &
+  theme(legend.position = "right",
+        text = element_text(size = 13))
 
 ggsave("./03_output/3d_pday_exp_through_years/exp_all.jpg", fig3, 
-       width = 8, height = 16)
+       width = 8, height = 16, dpi = 2000)
 

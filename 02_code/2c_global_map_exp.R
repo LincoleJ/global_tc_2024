@@ -85,7 +85,7 @@ x = ggplot() +
   geom_text(data = bbox_by_region,
             aes(x = xmin-3+2, y = ymax+3-2, 
                 label = c("c", "a", "b", "d", "e")),
-            size = 2.5,
+            size = 4.0,
             family = "Century",
             fontface = "bold",
             color = "black") +
@@ -104,7 +104,7 @@ x = ggplot() +
          color = guide_colorbar(title.position = "top", title.hjust = 0.25, barwidth = 10))
 
 ggsave("./03_output/3c_pday_exp_map/global_pday_tc_map.jpg", x, 
-       dpi = 1000, width = 12, height = 6)
+       dpi = 2000, width = 12, height = 6)
 
 # 1b. Map of total global person-day hurricane expoures by ADM2
 y = ggplot() +
@@ -130,7 +130,7 @@ y = ggplot() +
                                              who_region != "South-East Asia"),
             aes(x = xmin-3+2, y = ymax+3-2, 
                 label = c("c", "a", "e")),
-            size = 2.5,
+            size = 4.0,
             family = "Century",
             fontface = "bold",
             color = "black") +
@@ -148,7 +148,7 @@ y = ggplot() +
   guides(fill = guide_colorbar(title.position = "top", title.hjust = 0.25, barwidth = 10),
          color = guide_colorbar(title.position = "top", title.hjust = 0.25, barwidth = 10))
 ggsave("./03_output/3c_pday_exp_map/global_pday_hurr_map.jpg", y, 
-       dpi = 1000, width = 12, height = 6)
+       dpi = 2000, width = 12, height = 6)
 
 # save as one plot 
 tc_ht_map = (x / y) +
@@ -157,4 +157,4 @@ tc_ht_map = (x / y) +
         legend.direction = "horizontal",
         legend.text = element_text(angle = 45, hjust = 1))
 ggsave("./03_output/3c_pday_exp_map/global_tracks_map.jpg", tc_ht_map,
-       dpi = 1000, width = 12, height = 12)
+       dpi = 2000, width = 12, height = 12)

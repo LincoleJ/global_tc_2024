@@ -29,6 +29,10 @@ total_pday_hurr_exp = all_pday_hurr_exp %>%
 tc_model <- lm(sum_pday_exp ~ year, data = total_pday_tc_exp)
 ht_model <- lm(sum_pday_exp ~ year, data = total_pday_hurr_exp)
 
+# confidence intervals 
+confint(tc_model, level = 0.95)
+confint(ht_model, level = 0.95)
+
 ggplot(total_pday_tc_exp, aes(x = year, y = sum_pday_exp)) +
   geom_point() +
   stat_smooth(method = lm) +
@@ -76,6 +80,10 @@ per_capita_hurr_model = lm(per_cap_exp ~ year, per_capita_hurr_exp)
 ggplot(per_capita_hurr_exp, aes(x = year, y = per_cap_exp)) +
   geom_point() +
   geom_smooth(method = "lm", se = FALSE)
+
+# confidence intervals 
+confint(per_capita_tc_model, level = 0.95)
+confint(per_capita_hurr_model, level = 0.95)
 
 
 # 2. calculate the total number population exposed in 2024
