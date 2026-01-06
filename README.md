@@ -30,6 +30,8 @@ The dataset and code used for paper to characterize global tropical cyclone even
 
 2f_all_study_period_exp_map: code for global map of person-day exposure totaled over time (1980-2024)
 
+2i_temporal_trend_by_region: code for temporal trends in person-day exposure
+
 ## 3. Output
 
 3a_pday_exp_vs_grdi: Fig. 1B, D
