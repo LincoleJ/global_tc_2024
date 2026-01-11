@@ -6,7 +6,7 @@ Lingke Jiang, Victoria D. Lynch, G. Brooke Anderson, Xiao Wu, Robbie M. Parks
 
 The dataset and code used for paper 
 
-[[LINK]]
+https://iopscience.iop.org/article/10.1088/1748-9326/ae34cc/meta
 
 ## 1. Data
 
